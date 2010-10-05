@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script>
+		function factorial(n) {
+		  if ((n == 0) || (n == 1))
+			return 1
+		   else {
+			  result = (n * factorial(n-1) )
+			  return result
+		   }
+		}
+		
+		function inArray( num, array ) {
+			var toReturn = false;
+			for(var i=0;i<array.length;i++) {
+				if(num==array[i]) {
+					toReturn = true;
+				}
+			}
+			return toReturn;
+		}
+		
+		Array.prototype.max = function() {
+			var max = this[0],
+				len = this.length;
+			for (var i = 1; i < len; i++) if (this[i] > max) max = this[i];
+			return max;
+		}
+		
+		function getMin(arr) {
+			var min = '',
+				len = arr.length;
+			for (var i = 0; i < len; i++) { 
+				if ((!isNaN(min) && !isNaN(arr[i]) && min > arr[i]) || (!isNaN(arr[i]) && min=='')) { 
+					min = arr[i];
+				}
+				else {
+					continue;
+				}
+			}
+			return min;
+		}
+		
+		var isEven = function(num){
+			if (num%2 == 0) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		
+		var maxMoveValue = -1,
+			minMoveValue = -2;
+		
+		var turn = function(obj,gameboard) {
+			gameboard[obj.square] = obj.player;
+		};
+		
+		var board = [0,1,2,3,4,5,6,7,8],
+			wins = [
+				[board[0],board[1],board[2]]
+				,[board[0],board[3],board[6]]
+				,[board[0],board[4],board[8]]
+				,[board[1],board[4],board[7]]
+				,[board[3],board[4],board[5]]
+				,[board[6],board[7],board[8]]
+				,[board[2],board[5],board[8]]
+				,[board[2],board[4],board[6]]
+				];
+	
+	var victory = function(player) {
+		alert(player+' has triumphed!');
+	};
+	
+	var checkWinner = function() {
+		for(var p=0;p<wins.length;p++) {
+			var maxWin = 0,
+				minWin = 0;
+			for(var t=0;t<wins[p].length;t++) {
+				if(wins[p][t]==maxMoveValue) {
+					maxWin++;
+				}
+				else if(wins[p][t]==minMoveValue) {
+					minWin++;
+				}
+			}
+			if(maxWin==wins[p].length) {
+				winner = 'Max';
+			}
+			else if(minWin==wins[p].length) {
+				winner = 'Min';
+			}
+			else {
+				winner = false;
+			}
+		}
+		return winner;
+	};
+	
+	var choices = function(gameboard,player) {
+		var backup = {},
+			tempMax,
+			tempMin,
+			max,
+			min,
+			val = [],
+			winLength;
+		for(i=0;i<gameboard.length;i++) {
+			val = [];
+			if(gameboard[i] >= 0) {
+				for(j=0;j<gameboard.length;j++) {
+					if(gameboard[j] >= 0 && j!=i) {
+						max = 0,
+						min = 0;
+						for(k=0;k<wins.length;k++) {
+							tempMax = 0,
+							tempMin = 0,
+							winLength = wins[k].length;
+							for(l=0;l<winLength;l++) {
+								var neither = (wins[k][l]!=i && wins[k][l]!=j) ? true : false;
+								if(wins[k][l]==i || neither) {
+									tempMax++;
+								}
+								if(wins[k][l]==j || neither) {
+									tempMin++;
+								}
+							}
+							if(tempMax==winLength) {
+								max++;
+							}
+							if(tempMin==winLength) {
+								min++;
+							}
+										/*if(!inArray(i,wins[k]) && !inArray(j,wins[k])) {
+											empty = true;
+										}
+										if((inArray(i,wins[k]) && !inArray(j,wins[k])) || empty) {
+											max++;
+										}
+										else if((inArray(j,wins[k]) && !inArray(i,wins[k])) || empty) {
+											min++;
+										}
+										*/
+						}
+						val[j] = max - min;
+					}
+				}
+				backup.value = (player == maxMoveValue) ? getMin(val) : val.max();
+				//console.log(backup.value);
+				backup.square = val.indexOf(backup.value);
+				backup.player = player;
+			}
+		}
+		return backup;
+	};
+	
+	var play = function(cb) {
+		for(h=0;h<board.length;h++) {
+			var winner = checkWinner(),
+				curPlayer = (isEven(h)) ? -1 : -2;
+			//alert(h+' even:'+curPlayer);
+			if(winner) {
+				victory(winner);
+				return;
+			}
+			else {
+				turn(choices(board,curPlayer),board);
+			}
+		}
+		cb();
+	};
+		
+	window.onload = play(function() {
+		for(var i=0;i<board.length;i++) {
+			console.log('Space '+i+' is occupied by '+board[i]);
+		}
+	});
+		
+		
+	
+	</script>
+</head>
+
+<body>
+
+</body>
+</html>
